@@ -43,7 +43,7 @@ export function PointOfSale() {
         { id: "5", name: "Organic Tea", sku: "TEA-001", category: "Beverages", price: 3.99, stock: 11 },
         { id: "6", name: "Chocolate Croissant", sku: "BAK-001", category: "Bakery", price: 2.99, stock: 28 },
         { id: "7", name: "Premium Coffee", sku: "COF-001", category: "Beverages", price: 4.99, stock: 42 },
-        { id: "8", name: "Organic Tea", sku: "TEA-001", category: "Beverages", price: 3.99, stock: 15 },
+        { id: "8", name: "Organic Tea", sku: "TEA-001", category: "Beverages", price: 3.99, stock: 0},
         { id: "9", name: "Chocolate Croissant", sku: "BAK-001", category: "Bakery", price: 2.99, stock: 28 },
     ]);
     const [selectedCategory, setSelectedCategory] = React.useState("");
