@@ -1,17 +1,5 @@
 import React from "react";
 import { debounce } from 'lodash';
-import {
-    Typography, Card, CardHeader, CardBody, IconButton,
-    Chip, Badge, List, ListItem, ListItemPrefix, ListItemSuffix,
-    CardFooter, Dialog, DialogHeader, DialogBody, DialogFooter,
-    Checkbox, Input, Select, Option, Button, Progress
-} from "@material-tailwind/react";
-import {
-    MagnifyingGlassIcon, XMarkIcon, PlusIcon, MinusIcon,
-    PrinterIcon, EnvelopeIcon, CheckIcon, ShoppingCartIcon
-} from "@heroicons/react/24/outline";
-import { CheckCircleIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
-
 // Import components
 import {
     Cart,
@@ -31,6 +19,8 @@ import {
     filterRefundTransactions,
     calculateRefundAmount
 } from '../../utils';
+import { capitalizeWords } from "@/utils/text";
+import AlertPopUp from "@/components/Alert";
 
 export function PointOfSale() {
     const [cart, setCart] = React.useState([]);
@@ -43,7 +33,7 @@ export function PointOfSale() {
         { id: "5", name: "Organic Tea", sku: "TEA-001", category: "Beverages", price: 3.99, stock: 11 },
         { id: "6", name: "Chocolate Croissant", sku: "BAK-001", category: "Bakery", price: 2.99, stock: 28 },
         { id: "7", name: "Premium Coffee", sku: "COF-001", category: "Beverages", price: 4.99, stock: 42 },
-        { id: "8", name: "Organic Tea", sku: "TEA-001", category: "Beverages", price: 3.99, stock: 0},
+        { id: "8", name: "Organic Tea", sku: "TEA-001", category: "Beverages", price: 3.99, stock: 0 },
         { id: "9", name: "Chocolate Croissant", sku: "BAK-001", category: "Bakery", price: 2.99, stock: 28 },
     ]);
     const [selectedCategory, setSelectedCategory] = React.useState("");
@@ -172,6 +162,9 @@ export function PointOfSale() {
     const [openRefundSuccessModal, setOpenRefundSuccessModal] = React.useState(false);
     const [refundSuccessData, setRefundSuccessData] = React.useState(null);
     const [filteredProducts, setFilteredProducts] = React.useState(products);
+    const [openAlert, setOpenAlert] = React.useState(false);
+    const [alertType, setAlertType] = React.useState("");
+    const [alertMessage, setAlertMessage] = React.useState("");
     const [refundFilter, setRefundFilter] = React.useState({
         dateRange: '',
         productName: '',
@@ -191,17 +184,27 @@ export function PointOfSale() {
 
     // Cart functions
     const addToCart = (product) => {
-        setCart(prev => {
-            const existing = prev.find(item => item.id === product.id);
-            return existing
-                ? prev.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                )
-                : [...prev, { ...product, quantity: 1 }];
-        });
+        if (product.stock != 0) {
+            setCart(prev => {
+                const existing = prev.find(item => item.id === product.id);
+                return existing
+                    ? prev.map(item =>
+                        item.id === product.id
+                            ? { ...item, quantity: item.quantity + 1 }
+                            : item
+                    )
+                    : [...prev, { ...product, quantity: 1 }];
+            });
+        } else {
+            callAlert(capitalizeWords("Sorry Item Is Out Of Stock"))
+        }
     };
+
+    const callAlert = (message) => {
+        setAlertMessage(message)
+        setAlertType("error")
+        setOpenAlert(true)
+    }
 
     const updateQuantity = (id, quantity) => {
         if (quantity < 1) {
@@ -305,7 +308,7 @@ export function PointOfSale() {
                     handleSearch={handleSearch}
                     setSearchTerm={setSearchTerm}
                     changeCategory={changeCategory}
-                     addToCart={addToCart}
+                    addToCart={addToCart}
                     setOpenRefundModal={setOpenRefundModal}
                 />
 
@@ -355,6 +358,7 @@ export function PointOfSale() {
                 handler={setOpenRefundSuccessModal}
                 refundData={refundSuccessData}
             />
+            <AlertPopUp message={alertMessage} alertOpen={openAlert} type={alertType} />
         </div>
     );
 }

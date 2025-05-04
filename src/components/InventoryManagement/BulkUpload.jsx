@@ -12,6 +12,7 @@ import {
     IconButton
 } from "@material-tailwind/react";
 import { ArrowUpTrayIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import AlertPopUp from "../Alert";
 
 const BulkUploadComponent = ({
     open,
@@ -138,15 +139,14 @@ const BulkUploadComponent = ({
                     )}
 
                     {error && (
-                        <Alert color="red" className="mt-2">
-                            {error}
-                        </Alert>
+
+                        <AlertPopUp message={error} alertOpen={true} type={"error"} />
+
                     )}
 
                     {uploadStatus?.message && (
-                        <Alert color={uploadStatus.success ? "green" : "red"}>
-                            {uploadStatus.message}
-                        </Alert>
+                        <AlertPopUp message={uploadStatus.message} alertOpen={true} type={uploadStatus.success ? "success" : "error"} />
+
                     )}
 
                     {uploadProgress > 0 && uploadProgress < 100 && (

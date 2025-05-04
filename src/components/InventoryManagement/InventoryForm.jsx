@@ -7,9 +7,9 @@ import {
     IconButton,
     Avatar,
     Typography,
-    Alert
 } from "@material-tailwind/react";
 import { TrashIcon, PlusIcon } from "@heroicons/react/24/solid";
+import AlertPopUp from "../Alert";
 
 const InventoryForm = ({ product, onClose, onSubmit }) => {
     const [formData, setFormData] = useState(
@@ -113,25 +113,8 @@ const InventoryForm = ({ product, onClose, onSubmit }) => {
 
     return (
         <>
-            <Alert
-                variant="gradient"
-                open={alertOpen}
-                icon={<Icon />}
-                action={
-                    <Button
-                        variant="text"
-                        color="white"
-                        size="sm"
-                        className="!absolute top-3 right-3"
-                        onClick={() => setAlertOpen(false)}
-                    >
-                        Close
-                    </Button>
-                }
-            >
-                Please complete the existing custom fields before adding a new one.
-            </Alert>
 
+            <AlertPopUp message={" Please complete the existing custom fields before adding a new one."} alertOpen={alertOpen} type={"warning"} />
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <Input
@@ -284,7 +267,7 @@ const InventoryForm = ({ product, onClose, onSubmit }) => {
     );
 };
 
-function Icon() {
+export function Icon() {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

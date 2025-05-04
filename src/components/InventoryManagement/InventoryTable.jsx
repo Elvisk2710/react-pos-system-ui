@@ -15,7 +15,6 @@ import {
     Select,
     Option,
     Spinner,
-    Alert,
     Drawer,
 } from "@material-tailwind/react";
 import { XMarkIcon, ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
@@ -26,6 +25,7 @@ import {
     SparklesIcon,
 } from "@heroicons/react/24/solid";
 import BulkActionsPanel from "./BulkActionsPanel";
+import AlertPopUp from "../Alert";
 
 const InventoryTable = ({
     products,
@@ -51,10 +51,10 @@ const InventoryTable = ({
     onBulkCategoryChange,
     onBulkStatusChange
 }) => {
-    const className = "border-b border-blue-gray-50 py-3 px-6 text-left";
+    const className = "py-2 px-6 text-left";
     const [showBulkActions, setShowBulkActions] = React.useState(false);
     const [activePage, setActivePage] = React.useState(1);
-    const rowsPerPage = 7;
+    const rowsPerPage = 8;
 
     const handleBulkClose = () => {
         setShowBulkActions(false);
@@ -179,9 +179,7 @@ const InventoryTable = ({
                             <Spinner className="h-8 w-8" />
                         </div>
                     ) : error ? (
-                        <Alert color="red" className="m-6">
-                            {error}
-                        </Alert>
+                        <AlertPopUp message={error} alertOpen={true} type={"error"} />
                     ) : (
                         <>
                             <table className="w-full min-w-[640px] table-auto">

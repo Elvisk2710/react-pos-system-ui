@@ -43,6 +43,7 @@ import {
   SeasonalEditsComponent
 } from '../../components/InventoryManagement';
 import inventoryTableData from "./mockData";
+import AlertPopUp from "@/components/Alert";
 
 export function InventoryManagement() {
   const { user } = useContext(AuthContext);
@@ -90,7 +91,7 @@ export function InventoryManagement() {
       setSelectedProduct(product);
       setOpenDrawer(true);
     } else {
-      alert(`Product with barcode ${barcode} not found`);
+      <AlertPopUp message={`Product with barcode ${barcode} not found`} alertOpen={true} type={"error"} />
     }
   };
 
