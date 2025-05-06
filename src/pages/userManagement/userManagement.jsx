@@ -5,7 +5,7 @@ import {
     CardBody,
     Typography,
     Spinner,
-    Alert
+    Alert, Tabs, TabsHeader, Tab, TabsBody, TabPanel
 } from "@material-tailwind/react";
 import { AuthContext } from '@/context/AuthContext';
 import { useUserManagement } from '@/hooks/useUserManagement';
@@ -18,6 +18,7 @@ import {
 import AlertPopUp from '@/components/Alert';
 import initialFormState from './constants';
 import { capitalize } from 'lodash';
+import AuditLogPage from '@/components/userManagement/AuditLogPage';
 
 const UserManagement = () => {
     const { user } = useContext(AuthContext);
@@ -42,6 +43,7 @@ const UserManagement = () => {
     const [formData, setFormData] = useState(
         initialFormState
     );
+    const [activeTab, setActiveTab] = React.useState("users");
 
     const handleInputChange = (e) => {
         const { name, value, checked } = e.target;
@@ -137,83 +139,142 @@ const UserManagement = () => {
         }
     };
 
+    const tabs = [
+        {
+            label: "User Management",
+            value: "users",
+            content: (
+                <>
+                    <div className="mb-4 p-4 bg-white rounded-lg shadow">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 basis-[60%]">
+                                <UserFilters
+                                    searchTerm={searchTerm}
+                                    setSearchTerm={setSearchTerm}
+                                    roleFilter={roleFilter}
+                                    setRoleFilter={setRoleFilter}
+                                />
+                            </div>
+                            <UserActions
+                                onAddUser={() => {
+                                    resetForm();
+                                    setOpenDialog(true);
+                                }}
+                                hasUserManagementPermission={user.permissions?.userManagement}
+                            />
+                        </div>
+                    </div>
+                    <Card className="mt-4">
+                        <CardHeader
+                            floated={false}
+                            shadow={false}
+                            color="transparent"
+                            className="m-0 flex items-center justify-between p-4"
+                        >
+                            <div>
+                                <Typography variant="h6" color="blue-gray" className="mb-1">
+                                    User Management
+                                </Typography>
+                                <Typography
+                                    variant="small"
+                                    className="flex items-center gap-1 font-normal text-blue-gray-600"
+                                >
+                                    <strong>{capitalize(user.name)}</strong>: {capitalize(user.roles[0])}
+                                </Typography>
+                            </div>
+                        </CardHeader>
+                        <CardBody>
+                            {fetchError && (
+                                <AlertPopUp message={fetchError} alertOpen={true} type={"error"} />
+                            )}
+
+                            {loading ? (
+                                <div className="flex justify-center items-center h-64">
+                                    <Spinner className="h-8 w-8" />
+                                </div>
+                            ) : (
+                                <UserTable
+                                    users={filteredUsers}
+                                    sortConfig={sortConfig}
+                                    requestSort={requestSort}
+                                    userId={user.id}
+                                    onEditUser={editUser}
+                                    onDeleteUser={deleteUser}
+                                    hasUserManagementPermission={user.permissions?.userManagement}
+                                />
+                            )}
+                        </CardBody>
+                    </Card>
+                </>
+
+            ),
+        },
+        {
+            label: "Audit Logs",
+            value: "audit",
+            content: (
+                <Card className="mt-4">
+                    <CardBody>
+                        <AuditLogPage /> {/* Your audit log component */}
+                    </CardBody>
+                </Card>
+            ),
+        },
+        // {
+        //     label: "Roles & Permissions",
+        //     value: "roles",
+        //     content: (
+        //         <Card className="mt-4">
+        //             <CardBody>
+        //                 <RolesPermissionsSection /> {/* Your roles/permissions component */}
+        //             </CardBody>
+        //         </Card>
+        //     ),
+        // },
+    ];
+
     return (
         <div className="mt-2 flex-1 overflow-auto scrollbar-hide">
-            <div className="mb-4 p-4 bg-white rounded-lg shadow">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 basis-[60%]">
-                        <UserFilters
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            roleFilter={roleFilter}
-                            setRoleFilter={setRoleFilter}
-                        />
-                    </div>
-                    <UserActions
-                        onAddUser={() => {
-                            resetForm();
-                            setOpenDialog(true);
-                        }}
-                        hasUserManagementPermission={user.permissions?.userManagement}
-                    />
-                </div>
-            </div>
-            <Card className="">
-                <CardHeader
-                    floated={false}
-                    shadow={false}
-                    color="transparent"
-                    className="m-0 flex items-center justify-between p-4"
-                >
-                    <div>
-                        <Typography variant="h6" color="blue-gray" className="mb-1">
-                            User Management
-                        </Typography>
-                        <Typography
-                            variant="small"
-                            className="flex items-center gap-1 font-normal text-blue-gray-600"
+            <Tabs value={activeTab} onChange={setActiveTab}>
+                <TabsHeader className="bg-transparent z-0" indicatorProps={{
+                    className: "bg-blue-500/10 shadow-none ",
+                }}>
+                    {tabs.map(({ label, value }) => (
+                        <Tab
+                            key={value}
+                            value={value}
+                            className={`${activeTab === value ? "text-blue-500" : ""} z-0`}
                         >
-                            <strong>{capitalize(user.name)}</strong>: {capitalize(user.roles[0])}
-                        </Typography>
-                    </div>
-                </CardHeader>
-                <CardBody>
-
-                    {fetchError && (
-                        <AlertPopUp message={fetchError} alertOpen={true} type={"error"} />
-                    )}
-
-                    {loading ? (
-                        <div className="flex justify-center items-center h-64">
-                            <Spinner className="h-8 w-8" />
-                        </div>
-                    ) : (
-                        <UserTable
-                            users={filteredUsers}
-                            sortConfig={sortConfig}
-                            requestSort={requestSort}
-                            userId={user.id}
-                            onEditUser={editUser}
-                            onDeleteUser={deleteUser}
-                            hasUserManagementPermission={user.permissions?.userManagement}
-                        />
-                    )}
-                </CardBody>
-
-                <UserForm
-                    open={openDialog}
-                    onClose={() => {
-                        setOpenDialog(false);
-                        resetForm();
-                    }}
-                    onSubmit={handleSubmit}
-                    formData={formData}
-                    onInputChange={handleInputChange}
-                    onRoleChange={handleRoleChange}
-                    editMode={editMode}
-                    error={formError}
-                />
-            </Card>
+                            {label}
+                        </Tab>
+                    ))}
+                </TabsHeader>
+                <TabsBody animate={{
+                    initial: { y: 250 },
+                    mount: { y: 0 },
+                    unmount: { y: 250 },
+                }}>
+                    {tabs.map(({ value, content }) => (
+                        <TabPanel key={value} value={value} className="p-0">
+                            {content}
+                        </TabPanel>
+                    ))}
+                </TabsBody>
+            </Tabs>
+            {/* User Form Dialog (shared across tabs) */}
+            <UserForm
+                open={openDialog}
+                onClose={() => {
+                    setOpenDialog(false);
+                    resetForm();
+                }}
+                onSubmit={handleSubmit}
+                formData={formData}
+                onInputChange={handleInputChange}
+                onRoleChange={handleRoleChange}
+                editMode={editMode}
+                error={formError}
+            />
         </div>
     );
 };
